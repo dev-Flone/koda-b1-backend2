@@ -1,5 +1,4 @@
 @using System.Globalization
-@using Microsoft.AspNetCore.Http.HttpResults
 @model IReadOnlyList<KodaStore.Api.DTOs.ProductResponse>
 
 @{
@@ -15,41 +14,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData</title>
+    <link rel="stylesheet" href="~/styles/Catalogue.css">
 </head>
 
 <body>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Product Code</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Stock</th>
-                <th>Price</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model.Count == 0)
-            {
+    <div class="table-container">
+        <button>+ Add Product</button>
+        <table>
+            <thead>
                 <tr>
-                    <td colspan="5" style="margin: auto;">There is no Product yet.</td>
+                    <th>Product Code</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Stock</th>
+                    <th>Price</th>
                 </tr>
-            }
-            else
-            {
-                @foreach (var p in Model)
+            </thead>
+            <tbody>
+                @if (Model.Count == 0)
                 {
                     <tr>
-                        <td>@p.ProductCode</td>
-                        <td>@p.Name</td>
-                        <td>@p.Category</td>
-                        <td>@p.Stock</td>
-                        <td>@p.Price.ToString("C0", rupiah)</td>
+                        <td colspan="5" style="margin: auto;">There is no Product yet.</td>
                     </tr>
                 }
-            }
-        </tbody>
-    </table>
+                else
+                {
+                    @foreach (var p in Model)
+                    {
+                        <tr>
+                            <td>@p.ProductCode</td>
+                            <td>@p.Name</td>
+                            <td>@p.Category</td>
+                            <td>@p.Stock</td>
+                            <td>@p.Price.ToString("C0", rupiah)</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
 </body>
 
 </html>
