@@ -1,24 +1,22 @@
-using KodaStore.Api.Data;
 using KodaStore.Api.Models;
 using KodaStore.Api.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using KodaStore.Api.Services;
 
 namespace KodaStore.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/products")]
 
-public sealed class ProductController(InMemoryProductCatalogue catalogue) : ControllerBase
+public sealed class ProductController(IProductService service) : ControllerBase
 {
-    private readonly InMemoryProductCatalogue _catalogue = catalogue;
+    private readonly IProductService _service = service;
 
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyList<ProductResponse>), StatusCodes.Status200OK)]
-    public ActionResult<IReadOnlyList<Product>> GetAll()
+    public ActionResult<IReadOnlyList<ProductResponse>> GetAll()
     {
-        var products = _catalogue.GetAll().Select(ProductResponse.FromModel).ToArray();
-
-        return Ok(products);
+        return Ok(_service.GetAll());
     }
 
     [HttpGet("{productCode}")]
@@ -26,18 +24,9 @@ public sealed class ProductController(InMemoryProductCatalogue catalogue) : Cont
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public ActionResult<ProductResponse> GetByCode([FromRoute] string productCode)
     {
-        var product = _catalogue.GetByCode(productCode);
+        var product = _service.GetByCode(productCode);
 
-        if (product is null)
-        {
-            return Problem(
-                statusCode: StatusCodes.Status404NotFound,
-                title: "Product not found.",
-                detail: $"No product was found for code {productCode}"
-            );
-        }
-
-        return Ok(ProductResponse.FromModel(product));
+        return product is null ? Problem(statusCode: StatusCodes.Status404NotFound, title: "Product not found") : Ok(product);
     }
 
     [HttpPost]
@@ -45,36 +34,43 @@ public sealed class ProductController(InMemoryProductCatalogue catalogue) : Cont
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public ActionResult<ProductResponse> Create([FromBody] CreateProductRequest request)
     {
-        var product = new Product(
-            request.ProductCode,
-            request.Name,
-            request.Price,
-            request.Stock,
-            request.Category
-        );
-
-        _catalogue.Add(product);
-
-        return CreatedAtAction(nameof(GetByCode), new { productCode = product.ProductCode }, ProductResponse.FromModel(product));
-    }
-
-    [HttpDelete("{productCode}")]
-    [ProducesResponseType(typeof(ProductResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public ActionResult<ProductResponse> Delete([FromRoute] string productCode)
-    {
-        var product = _catalogue.GetByCode(productCode);
+        var product = _service.Create(request);
 
         if (product is null)
         {
-            return Problem(
+            return Problem(statusCode: StatusCodes.Status409Conflict, title: "Product code already exist.");
+        }
+
+        return CreatedAtAction(nameof(GetByCode), new { productCode = product.ProductCode }, product);
+    }
+
+    [HttpDelete("{productCode}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public ActionResult Delete([FromRoute] string productCode)
+    {
+        return _service.Delete(productCode) ? NoContent() : Problem(
                 statusCode: StatusCodes.Status404NotFound,
                 title: "Can't find product.",
                 detail: $"There is no product with code {productCode}"
             );
-        }
+    }
 
-        _catalogue.Delete(productCode);
-        return NoContent();
+    [HttpPut("{productCode}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public ActionResult<ProductResponse> Update([FromRoute] string productCode, [FromBody] UpdateProductRequest request)
+    {
+        try
+        {
+            var existingProduct = _service.Update(productCode, request);
+
+            return existingProduct is null ? Problem(statusCode: StatusCodes.Status404NotFound, title: "Product Not Found.", detail: $"No product was found for code {productCode}") : Ok(existingProduct);
+        }
+        catch (ArgumentException e)
+        {
+            return Problem(statusCode: StatusCodes.Status400BadRequest, title: "Invalid product", detail: e.Message);
+        }
     }
 }

@@ -8,3 +8,5 @@ public sealed record ProductResponse(string ProductCode, string Name, long Price
 }
 
 public sealed record CreateProductRequest(string ProductCode, string Name, long Price, int Stock, string Category);
+
+public record UpdateProductRequest(string Name, long Price, int Stock, string Category);

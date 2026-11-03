@@ -16,6 +16,8 @@ C:\Users\Flone\Documents\Kodakademy\dotnet5\src\KodaStore.Api\obj\Debug\net10.0\
 C:\Users\Flone\Documents\Kodakademy\dotnet5\src\KodaStore.Api\obj\Debug\net10.0\KodaStore.Api.csproj.CoreCompileInputs.cache
 C:\Users\Flone\Documents\Kodakademy\dotnet5\src\KodaStore.Api\obj\Debug\net10.0\KodaStore.Api.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\Flone\Documents\Kodakademy\dotnet5\src\KodaStore.Api\obj\Debug\net10.0\KodaStore.Api.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Flone\Documents\Kodakademy\dotnet5\src\KodaStore.Api\obj\Debug\net10.0\KodaStore.Api.RazorAssemblyInfo.cache
+C:\Users\Flone\Documents\Kodakademy\dotnet5\src\KodaStore.Api\obj\Debug\net10.0\KodaStore.Api.RazorAssemblyInfo.cs
 C:\Users\Flone\Documents\Kodakademy\dotnet5\src\KodaStore.Api\obj\Debug\net10.0\KodaStore.Api.sourcelink.json
 C:\Users\Flone\Documents\Kodakademy\dotnet5\src\KodaStore.Api\obj\Debug\net10.0\rjimswa.dswa.cache.json
 C:\Users\Flone\Documents\Kodakademy\dotnet5\src\KodaStore.Api\obj\Debug\net10.0\rjsmrazor.dswa.cache.json

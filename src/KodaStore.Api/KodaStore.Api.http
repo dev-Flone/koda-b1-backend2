@@ -8,10 +8,6 @@ GET {{url}}/api/v1/products
 Accept: application/json
 
 ###
-GET {{url}}/api/v1/products/PC001
-Accept: application/json
-
-###
 GET {{url}}/api/v1/products/PR001
 Accept: application/json
 
@@ -32,3 +28,14 @@ Content-Type: application/json
 DELETE {{url}}/api/v1/products/PR001
 Accept: application/json
 
+###
+PUT {{url}}/api/v1/products/PR001
+Accept: application/json
+Content-Type: application/json
+
+{
+    "name": "Mouse",
+    "price": "25000",
+    "stock": "20",
+    "category": "Aksesoris"
+}

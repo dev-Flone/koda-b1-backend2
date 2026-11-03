@@ -1,32 +1,65 @@
+using System.Net.Http.Headers;
 using KodaStore.Api.Models;
 
 namespace KodaStore.Api.Data;
 
 public sealed class InMemoryProductCatalogue
 {
+    private readonly object _sync = new();
     private readonly List<Product> _products = [];
 
     public IReadOnlyList<Product> GetAll()
     {
-        return [.. _products];
+        lock (_sync)
+        {
+            return [.. _products];
+        }
     }
 
     public Product? GetByCode(string productCode)
     {
-        return _products.FirstOrDefault(product => string.Equals(product.ProductCode, productCode.Trim(), StringComparison.OrdinalIgnoreCase));
-    }
-
-    public void Add(Product product)
-    {
-        if (_products.Any(p => p.ProductCode == product.ProductCode))
+        lock (_sync)
         {
-            throw new ArgumentException($"Theres already product with code {product.ProductCode}");
+            return _products.FirstOrDefault(product => string.Equals(product.ProductCode, productCode.Trim(), StringComparison.OrdinalIgnoreCase));
         }
-        _products.Add(product);
     }
 
-    public void Delete(string productCode)
+    public bool TryCreateProduct(Product product)
     {
-        _products.RemoveAll(product => string.Equals(product.ProductCode, productCode.Trim(), StringComparison.OrdinalIgnoreCase));
+        lock (_sync)
+        {
+            if (_products.Any(p => string.Equals(p.ProductCode, product.ProductCode, StringComparison.OrdinalIgnoreCase)))
+            {
+                return false;
+            }
+            _products.Add(product);
+            return true;
+        }
+    }
+
+    public bool TryUpdateProduct(Product product)
+    {
+        lock (_sync)
+        {
+            var index = _products.FindIndex(p => string.Equals(p.ProductCode, product.ProductCode, StringComparison.OrdinalIgnoreCase));
+
+            if (index < 0) return false;
+
+            _products[index] = product;
+            return true;
+        }
+    }
+
+    public bool TryDeleteProduct(string productCode)
+    {
+        lock (_sync)
+        {
+            var index = _products.FindIndex(p => string.Equals(p.ProductCode, productCode.Trim(), StringComparison.OrdinalIgnoreCase));
+
+            if (index < 0) return false;
+
+            _products.RemoveAt(index);
+            return true;
+        }
     }
 }

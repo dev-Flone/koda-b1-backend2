@@ -1,0 +1,14 @@
+using System.Globalization;
+using KodaStore.Api.Models;
+
+namespace KodaStore.Api.Repositories;
+
+public interface IProductRepository
+{
+    IReadOnlyList<Product> GetAll();
+    Product? GetByCode(string productCode);
+    bool TryAdd(Product product);
+    bool TryUpdate(Product product);
+    bool TryDelete(string productCode);
+
+}
